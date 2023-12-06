@@ -386,6 +386,7 @@ Node **yield_node(Node *node) {
         }
         if (nodes[0] == NULL && nodes[1] == NULL && nodes[2] == NULL &&
             nodes[3] == NULL) {
+          free(nodes);
           return NULL;
         }
         return nodes;
@@ -437,12 +438,8 @@ char *build_graph(Node *root) {
     }
     for (int i = 0; i < 4; i++) {
       if (nodes[i] != NULL) {
-        if (is_member(set2, nodes[i]->board, root->size * root->size)) {
-          continue;
-        } else {
-          insert_heap(heap, init_node2(nodes[i], root->size));
-          insert(set2, nodes[i]->board, nodes[i]->size * nodes[i]->size);
-        }
+        insert_heap(heap, init_node2(nodes[i], root->size));
+        insert(set2, nodes[i]->board, nodes[i]->size * nodes[i]->size);
       }
     }
   }
