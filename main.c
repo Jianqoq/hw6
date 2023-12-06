@@ -289,28 +289,11 @@ Node *delete_min(Heap *heap) {
   return tmp->node;
 }
 
-// void print_heap(Node2 *node) {
-//   if (node == NULL) {
-//     return;
-//   }
-//   Node2 *left = node->left;
-//   Node2 *right = node->right;
-//   print_heap(left);
-//   if (left && left->letter != '\0') {
-//     printf("%c: %d\n", left->letter, left->freq);
-//   }
-//   print_heap(right);
-//   if (right && right->letter != '\0') {
-//     printf("%c: %d\n", right->letter, right->freq);
-//   }
-// }
-
 HashSet *set2 = NULL;
 HashSet *set1 = NULL;
 Queue *queue = NULL;
 Heap *heap = NULL;
 int *goal = NULL;
-int cnt = 0;
 
 Node **yield_node(Node *node) {
   Node **nodes = (Node **)malloc(sizeof(Node *) * 4);
@@ -396,12 +379,9 @@ char *build_graph(Node *root) {
   int total_size = root->size * root->size;
   while (!is_empty_heap(heap)) {
     Node *node = delete_min(heap);
-    cnt++;
-    // printf("cnt: %d\n", cnt);
     if (node->board[total_size - 1] == goal[total_size - 1] &&
         arr_equal(node->board, goal, node->size * node->size)) {
       Node *tmp = node;
-      printBoard(tmp->board, root->size);
       int length = 0;
       while (tmp != NULL) {
         length++;
@@ -437,9 +417,7 @@ char *build_graph(Node *root) {
           continue;
         } else {
           insert_heap(heap, init_node2(nodes[i], root->size));
-          //   printf("inserted heap\n");
           insert(set2, nodes[i]->board, nodes[i]->size * nodes[i]->size);
-          //   printf("inserted map\n");
         }
       }
     }
@@ -493,9 +471,7 @@ int main(int argc, char **argv) {
         inverse++;
     }
   }
-  printBoard(initial_board, k);
-  heap = init_heap(1000);
-  printf("cost: %d\n", estimate_cost(initial_board, k));
+  heap = init_heap(100000);
   if (k % 2 == 0) {
     int row = 0;
     for (int i = 0; i < k; i++) {
@@ -509,7 +485,7 @@ int main(int argc, char **argv) {
       solvable = 0;
     } else {
       solvable = 1;
-      set2 = init(100000);
+      set2 = init(100013);
       Node *root = (Node *)malloc(sizeof(Node));
       root->size = k;
       root->board = (int *)malloc(sizeof(int) * k * k);
