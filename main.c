@@ -304,89 +304,64 @@ Node **yield_node(Node *node) {
         if (row == 0) {
           nodes[0] = NULL;
         } else {
-          swap(node->board, row * node->size + column,
+          Node *tmp0 = (Node *)malloc(sizeof(Node));
+          tmp0->move = node->board[(row - 1) * node->size + column];
+          tmp0->size = node->size;
+          tmp0->board = (int *)malloc(sizeof(int) * node->size * node->size);
+          memcpy(tmp0->board, node->board,
+                 sizeof(int) * node->size * node->size);
+          swap(tmp0->board, row * node->size + column,
                (row - 1) * node->size + column);
-          if (!is_member(set2, node->board, node->size * node->size)) {
-            Node *tmp0 = (Node *)malloc(sizeof(Node));
-            tmp0->move = node->board[(row - 1) * node->size + column];
-            tmp0->size = node->size;
-            tmp0->board = (int *)malloc(sizeof(int) * node->size * node->size);
-            memcpy(tmp0->board, node->board,
-                   sizeof(int) * node->size * node->size);
-            tmp0->parent = node;
-            nodes[0] = tmp0;
-          } else {
-            nodes[0] = NULL;
-          }
-          swap(node->board, row * node->size + column,
-               (row - 1) * node->size + column);
+          tmp0->parent = node;
+          nodes[0] = tmp0;
         }
         // Down
         if (row == node->size - 1) {
           nodes[1] = NULL;
         } else {
-          swap(node->board, row * node->size + column,
+          Node *tmp1 = (Node *)malloc(sizeof(Node));
+          tmp1->move = node->board[(row + 1) * node->size + column];
+          tmp1->size = node->size;
+          tmp1->board = (int *)malloc(sizeof(int) * node->size * node->size);
+          memcpy(tmp1->board, node->board,
+                 sizeof(int) * node->size * node->size);
+          tmp1->parent = node;
+          swap(tmp1->board, row * node->size + column,
                (row + 1) * node->size + column);
-          if (!is_member(set2, node->board, node->size * node->size)) {
-            Node *tmp1 = (Node *)malloc(sizeof(Node));
-            tmp1->move = node->board[(row + 1) * node->size + column];
-            tmp1->size = node->size;
-            tmp1->board = (int *)malloc(sizeof(int) * node->size * node->size);
-            memcpy(tmp1->board, node->board,
-                   sizeof(int) * node->size * node->size);
-            tmp1->parent = node;
-            nodes[1] = tmp1;
-          } else {
-            nodes[1] = NULL;
-          }
-          swap(node->board, row * node->size + column,
-               (row + 1) * node->size + column);
+          nodes[1] = tmp1;
         }
         // Left
         if (column == 0) {
           nodes[2] = NULL;
         } else {
-          swap(node->board, row * node->size + column,
+          Node *tmp2 = (Node *)malloc(sizeof(Node));
+          tmp2->move = node->board[row * node->size + column - 1];
+          tmp2->size = node->size;
+          tmp2->board = (int *)malloc(sizeof(int) * node->size * node->size);
+          memcpy(tmp2->board, node->board,
+                 sizeof(int) * node->size * node->size);
+          swap(tmp2->board, row * node->size + column,
                row * node->size + column - 1);
-          if (!is_member(set2, node->board, node->size * node->size)) {
-            Node *tmp2 = (Node *)malloc(sizeof(Node));
-            tmp2->move = node->board[row * node->size + column - 1];
-            tmp2->size = node->size;
-            tmp2->board = (int *)malloc(sizeof(int) * node->size * node->size);
-            memcpy(tmp2->board, node->board,
-                   sizeof(int) * node->size * node->size);
-            tmp2->parent = node;
-            nodes[2] = tmp2;
-          } else {
-            nodes[2] = NULL;
-          }
-          swap(node->board, row * node->size + column,
-               row * node->size + column - 1);
+          tmp2->parent = node;
+          nodes[2] = tmp2;
         }
         // Right
         if (column == node->size - 1) {
           nodes[3] = NULL;
         } else {
-          swap(node->board, row * node->size + column,
+          Node *tmp3 = (Node *)malloc(sizeof(Node));
+          tmp3->move = node->board[row * node->size + column + 1];
+          tmp3->size = node->size;
+          tmp3->board = (int *)malloc(sizeof(int) * node->size * node->size);
+          memcpy(tmp3->board, node->board,
+                 sizeof(int) * node->size * node->size);
+          swap(tmp3->board, row * node->size + column,
                row * node->size + column + 1);
-          if (!is_member(set2, node->board, node->size * node->size)) {
-            Node *tmp3 = (Node *)malloc(sizeof(Node));
-            tmp3->move = node->board[row * node->size + column + 1];
-            tmp3->size = node->size;
-            tmp3->board = (int *)malloc(sizeof(int) * node->size * node->size);
-            memcpy(tmp3->board, node->board,
-                   sizeof(int) * node->size * node->size);
-            tmp3->parent = node;
-            nodes[3] = tmp3;
-          } else {
-            nodes[3] = NULL;
-          }
-          swap(node->board, row * node->size + column,
-               row * node->size + column + 1);
+          tmp3->parent = node;
+          nodes[3] = tmp3;
         }
         if (nodes[0] == NULL && nodes[1] == NULL && nodes[2] == NULL &&
             nodes[3] == NULL) {
-          free(nodes);
           return NULL;
         }
         return nodes;
@@ -438,8 +413,12 @@ char *build_graph(Node *root) {
     }
     for (int i = 0; i < 4; i++) {
       if (nodes[i] != NULL) {
-        insert_heap(heap, init_node2(nodes[i], root->size));
-        insert(set2, nodes[i]->board, nodes[i]->size * nodes[i]->size);
+        if (is_member(set2, nodes[i]->board, root->size * root->size)) {
+          continue;
+        } else {
+          insert_heap(heap, init_node2(nodes[i], root->size));
+          insert(set2, nodes[i]->board, nodes[i]->size * nodes[i]->size);
+        }
       }
     }
   }
